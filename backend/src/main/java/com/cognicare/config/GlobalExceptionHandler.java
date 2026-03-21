@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleRuntime(RuntimeException ex) {
         System.out.println(">>> GLOBAL HANDLER: RuntimeException -> " + ex.getMessage());
         ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("Server error: " + ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
