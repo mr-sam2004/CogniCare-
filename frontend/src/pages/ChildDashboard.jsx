@@ -5,6 +5,9 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { Sparkles, Flame, Trophy, Star, Target, Rocket, Heart, Zap, PartyPopper } from 'lucide-react';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -559,304 +562,522 @@ const ChildDashboard = () => {
     datasets: [{
       label: 'My Score',
       data: (performance?.points || []).map((point) => point.score),
-      borderColor: 'rgb(16, 185, 129)',
-      backgroundColor: 'rgba(16, 185, 129, 0.25)',
+      borderColor: 'rgba(139, 92, 246, 1)',
+      backgroundColor: 'rgba(139, 92, 246, 0.15)',
+      borderWidth: 3,
       fill: true,
-      tension: 0.3,
+      tension: 0.4,
+      pointBackgroundColor: 'rgba(249, 115, 22, 1)',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 6,
+      pointHoverRadius: 8,
     }]
   };
 
+  const triggerConfetti = () => {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 overflow-hidden">
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/')}>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">C</span>
-              </div>
-              <span className="font-display font-bold text-xl bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                CogniCare+
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setShowFeedback(true)} className="text-yellow-500 hover:text-yellow-600 text-xl">⭐</button>
-              <button onClick={logout} className="text-gray-600 hover:text-red-600">Logout</button>
-            </div>
+    <div className="min-h-screen relative overflow-hidden bg-[#050714] text-white">
+      {/* Animated background blobs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-20 -left-10 w-72 h-72 bg-gradient-to-br from-orange-400/30 to-pink-500/20 blur-[120px] rounded-full animate-float" />
+        <div className="absolute top-40 right-0 w-80 h-80 bg-gradient-to-br from-blue-400/30 to-cyan-500/20 blur-[140px] rounded-full animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-20 left-1/4 w-64 h-64 bg-gradient-to-br from-purple-400/30 to-indigo-500/20 blur-[130px] rounded-full animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/2 right-1/4 w-56 h-56 bg-gradient-to-br from-green-400/20 to-emerald-500/20 blur-[110px] rounded-full animate-float" style={{ animationDelay: '1s' }} />
+      </div>
+
+      {/* Glass Navbar */}
+      <motion.nav 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="sticky top-0 z-50 mx-4 mt-4 px-6 py-4 glass-nav flex flex-wrap items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/')}>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 flex items-center justify-center shadow-glow">
+            <span className="text-white font-black text-xl">🎮</span>
+          </div>
+          <div>
+            <p className="text-lg font-black tracking-tight text-white">CogniCare+</p>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-white/60">My Quest Hub</p>
           </div>
         </div>
-      </nav>
+        <div className="flex items-center gap-3">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowFeedback(true)} 
+            className="px-4 py-2 rounded-xl bg-white/10 text-white/80 hover:text-white flex items-center gap-2"
+          >
+            <Star className="w-4 h-4 text-yellow-300" /> Rate
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={logout} 
+            className="px-4 py-2 rounded-xl bg-white/10 text-white/80 hover:text-white hover:bg-red-500/30 transition-colors"
+          >
+            Logout
+          </motion.button>
+        </div>
+      </motion.nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Hero Profile Section */}
         {profile && (
-          <div className="text-center mb-8">
-            <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl text-white shadow-xl overflow-hidden cursor-pointer group"
-                   onClick={() => fileInputRef.current?.click()}>
-                {profileImage ? (
-                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
-                    {profile.firstName?.[0] || '👤'}
+          <motion.section 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="relative glass-card p-6 sm:p-8 overflow-hidden"
+          >
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 blur-[80px] rounded-full" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-pink-400/20 to-purple-500/20 blur-[60px] rounded-full" />
+            
+            <div className="relative flex flex-col md:flex-row items-center gap-8">
+              {/* Avatar with progress ring */}
+              <div className="relative flex-shrink-0">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 p-1 shadow-glow cursor-pointer"
+                     onClick={() => fileInputRef.current?.click()}>
+                  <div className="w-full h-full rounded-full overflow-hidden bg-[#050714] flex items-center justify-center group relative">
+                    {profileImage ? (
+                      <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-5xl">{profile.firstName?.[0] || '🦸'}</span>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                      <span className="text-white text-xs font-semibold">📷 Change</span>
+                    </div>
                   </div>
-                )}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                  <span className="text-white text-sm">📷 Upload</span>
                 </div>
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleProfileImageUpload} className="hidden" />
+                {/* Level badge */}
+                <motion.div 
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ repeat: Infinity, duration: 3 }}
+                  className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-lg border-4 border-[#050714]"
+                >
+                  {profile.level || 1}
+                </motion.div>
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleProfileImageUpload}
-                className="hidden"
-              />
+
+              {/* Greeting & Info */}
+              <div className="flex-1 text-center md:text-left">
+                <motion.h1 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-3xl sm:text-4xl font-black"
+                >
+                  Hey, <span className="bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">{profile.firstName}</span>! <Sparkles className="inline w-8 h-8 text-yellow-300" />
+                </motion.h1>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-lg text-white/70 mt-2"
+                >
+                  {randomMessage}
+                </motion.p>
+
+                {/* Quick Stats Pills */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex flex-wrap justify-center md:justify-start gap-3 mt-5"
+                >
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/30 to-red-500/30 border border-orange-400/40">
+                    <Flame className="w-5 h-5 text-orange-400 animate-pulse" />
+                    <span className="font-bold text-orange-200">{profile.currentStreak || 0} Day Streak</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/30 to-pink-500/30 border border-purple-400/40">
+                    <Star className="w-5 h-5 text-purple-300" />
+                    <span className="font-bold text-purple-200">Level {profile.level || 1}</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/30 to-emerald-500/30 border border-green-400/40">
+                    <Trophy className="w-5 h-5 text-green-400" />
+                    <span className="font-bold text-green-200">{profile.totalScore || 0} XP</span>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Motivation Card */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                whileHover={{ scale: 1.03 }}
+                className="hidden lg:flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 min-w-[200px]"
+              >
+                <PartyPopper className="w-10 h-10 text-yellow-300 mb-3" />
+                <p className="text-sm font-semibold text-center text-white/80">Keep going!</p>
+                <p className="text-xs text-white/50 text-center mt-1">You're doing amazing</p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={triggerConfetti}
+                  className="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold shadow-glow"
+                >
+                  🎉 Celebrate!
+                </motion.button>
+              </motion.div>
             </div>
-            <h1 className="font-display text-3xl font-bold text-gray-900 mb-2">
-              Hey, {profile.firstName}! {profile.firstName?.[0] === 'A' ? '🎉' : '✨'}
-            </h1>
-            <p className="text-gray-600 text-lg mb-4">{randomMessage}</p>
-            <div className="flex justify-center gap-4">
-              <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full font-semibold">
-                🔥 {profile.currentStreak} Day Streak
-              </div>
-              <div className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-semibold">
-                ⭐ Level {profile.level}
-              </div>
-              <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
-                🏆 {profile.totalScore} Points
-              </div>
-            </div>
-          </div>
+          </motion.section>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <div className="card mb-6">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">📋</span> Today's Tasks
-              </h2>
-              {tasks.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-4xl mb-4">🎉</p>
-                  <p className="text-gray-600">All tasks completed! Great job!</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Today's Tasks - Game Cards */}
+            <motion.section 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center">
+                  <Target className="w-5 h-5 text-white" />
                 </div>
+                <h2 className="text-2xl font-black">Today's Quests</h2>
+              </div>
+              
+              {tasks.length === 0 ? (
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="glass-card text-center py-12"
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="text-6xl mb-4"
+                  >
+                    🎉
+                  </motion.div>
+                  <p className="text-xl font-bold text-white">All quests completed!</p>
+                  <p className="text-white/60 mt-2">You're a superstar! Keep resting.</p>
+                </motion.div>
               ) : (
-                <div className="space-y-3">
-                  {tasks.map((task) => (
-                    <div key={task.assignmentId} className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
-                      <div className="flex items-center gap-4">
+                <div className="grid gap-4">
+                  {tasks.map((task, index) => (
+                    <motion.div
+                      key={task.assignmentId}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      whileHover={{ scale: 1.02, y: -4 }}
+                      className="glass-card p-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 group"
+                    >
+                      {/* Task Icon */}
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-glow transition-shadow">
                         <span className="text-3xl">
                           {task.moduleIcon === 'brain' ? '🧠' :
                            task.moduleIcon === 'palette' ? '🎨' :
                            task.moduleIcon === 'book' ? '📚' : '🎮'}
                         </span>
-                        <div>
-                          <h3 className="font-semibold">{task.moduleName || 'Activity'}</h3>
-                          <p className="text-sm text-gray-500">{task.moduleDurationMinutes || 0} minutes • {task.difficultyLevel}</p>
+                      </div>
+                      
+                      {/* Task Info */}
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="text-lg font-bold">{task.moduleName || 'Activity'}</h3>
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-2">
+                          <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">
+                            {task.moduleDurationMinutes || 0} min
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            task.difficultyLevel === 'HARD' ? 'bg-red-500/20 text-red-300' :
+                            task.difficultyLevel === 'MEDIUM' ? 'bg-orange-500/20 text-orange-300' :
+                            'bg-green-500/20 text-green-300'
+                          }`}>
+                            {task.difficultyLevel}
+                          </span>
                         </div>
                       </div>
-                      <button onClick={() => startTaskGame(task)}
-                        className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-                        Start!
-                      </button>
-                    </div>
+                      
+                      {/* Start Button */}
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => startTaskGame(task)}
+                        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold shadow-lg hover:shadow-glow transition-shadow flex items-center gap-2"
+                      >
+                        <Rocket className="w-4 h-4" /> Start!
+                      </motion.button>
+                    </motion.div>
                   ))}
                 </div>
               )}
-            </div>
+            </motion.section>
 
-            <div className="card mb-6">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">📈</span> My Game Performance
-              </h2>
-              {performance?.points?.length ? (
-                <>
-                  <p className="text-sm text-gray-600 mb-3">Completed: {performance.completedGames}/{performance.totalGames} | Avg Score: {performance.averageScore}</p>
-                  <Line data={myPerformanceChartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
-                </>
-              ) : (
-                <p className="text-gray-500 text-center py-4">Finish assigned modules to build your performance graph.</p>
-              )}
-            </div>
+            {/* Performance Chart */}
+            <motion.section 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-black">My Power Graph</h2>
+              </div>
+              <div className="glass-card p-6">
+                {performance?.points?.length ? (
+                  <>
+                    <div className="flex flex-wrap gap-4 mb-4">
+                      <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-300 text-sm font-semibold">
+                        Completed: {performance.completedGames}/{performance.totalGames}
+                      </div>
+                      <div className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-semibold">
+                        Avg Score: {performance.averageScore}
+                      </div>
+                    </div>
+                    <Line data={myPerformanceChartData} options={{ 
+                      responsive: true, 
+                      plugins: { legend: { display: false } },
+                      scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.7)' } }
+                      }
+                    }} />
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-white/50">
+                    <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Finish quests to build your power graph!</p>
+                  </div>
+                )}
+              </div>
+            </motion.section>
 
-            <div className="card">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">📹</span> Upcoming Sessions
-              </h2>
+            {/* Upcoming Sessions */}
+            <motion.section 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-black">Upcoming Sessions</h2>
+              </div>
               {sessions.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No sessions scheduled</p>
+                <div className="glass-card text-center py-8 text-white/50">
+                  <p>No sessions scheduled yet</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="grid gap-4">
                   {sessions.map((session) => (
-                    <div key={session.sessionId} className="p-4 bg-blue-50 rounded-xl">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold">{session.sessionTitle}</h3>
-                          <p className="text-sm text-gray-600">{new Date(session.scheduledAt).toLocaleString()}</p>
-                          <p className="text-xs text-gray-500">{session.sessionType}</p>
-                        </div>
-                        <div className="flex flex-col gap-2 items-end">
-                          {session.googleMeetLink && (
-                            <a href={session.googleMeetLink} target="_blank" rel="noopener noreferrer"
-                              className="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
-                              Join
-                            </a>
-                          )}
-                          <button
-                            onClick={() => handleAttendSession(session.sessionId)}
-                            className="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600"
-                          >
-                            Attended
-                          </button>
-                        </div>
+                    <motion.div
+                      key={session.sessionId}
+                      whileHover={{ scale: 1.02 }}
+                      className="glass-card p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                    >
+                      <div>
+                        <h3 className="text-lg font-bold">{session.sessionTitle}</h3>
+                        <p className="text-sm text-white/60 mt-1">
+                          {new Date(session.scheduledAt).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                        </p>
+                        <p className="text-xs text-white/40 mt-1">{session.sessionType}</p>
                       </div>
-                    </div>
+                      <div className="flex gap-2">
+                        {session.googleMeetLink && (
+                          <a href={session.googleMeetLink} target="_blank" rel="noopener noreferrer"
+                            className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold text-sm hover:shadow-glow transition-shadow">
+                            Join
+                          </a>
+                        )}
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleAttendSession(session.sessionId)}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold text-sm"
+                        >
+                          ✓ Attended
+                        </motion.button>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
-            </div>
+            </motion.section>
 
-            <div className="card mt-6">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">💊</span> My Prescriptions
-              </h2>
+            {/* Prescriptions */}
+            <motion.section 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-2xl font-black">My Prescriptions</h2>
+              </div>
               {prescriptions.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-4xl mb-2">💊</p>
-                  <p className="text-gray-500">No prescriptions yet</p>
-                  <p className="text-sm text-gray-400">Your doctor will prescribe medicines here</p>
+                <div className="glass-card text-center py-8 text-white/50">
+                  <p>No prescriptions yet 💊</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid gap-4">
                   {prescriptions.map((p) => (
-                    <div key={p.prescriptionId} className="border-2 border-dashed border-blue-200 rounded-2xl p-5 bg-gradient-to-br from-white to-blue-50 hover:shadow-lg transition-all">
+                    <motion.div
+                      key={p.prescriptionId}
+                      whileHover={{ scale: 1.02 }}
+                      className="glass-card p-5"
+                    >
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">🏥</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">💊</span>
                           <div>
-                            <h3 className="font-display font-bold text-blue-900">{p.title}</h3>
-                            <p className="text-xs text-blue-600">{p.doctorName} {p.doctorSpecialization ? `• ${p.doctorSpecialization}` : ''}</p>
+                            <h3 className="font-bold">{p.title}</h3>
+                            <p className="text-xs text-white/60">{p.doctorName}</p>
                           </div>
                         </div>
-                        <span className="text-3xl text-red-500 font-bold">℞</span>
+                        <span className="text-sm px-2 py-1 rounded-lg bg-pink-500/20 text-pink-300 font-semibold">Rx</span>
                       </div>
-
-                      <div className="space-y-2 mb-4">
-                        {p.dosage && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="text-blue-400">💉</span>
-                            <span className="text-gray-600"><span className="font-medium">Dosage:</span> {p.dosage}</span>
-                          </div>
-                        )}
-                        {p.frequency && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="text-blue-400">⏰</span>
-                            <span className="text-gray-600"><span className="font-medium">Frequency:</span> {p.frequency}</span>
-                          </div>
-                        )}
-                        {p.startDate && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="text-blue-400">📅</span>
-                            <span className="text-gray-600"><span className="font-medium">Duration:</span> {formatDate(p.startDate)} {p.endDate ? `to ${formatDate(p.endDate)}` : ''}</span>
-                          </div>
-                        )}
-                        {p.description && (
-                          <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
-                            <p className="text-xs text-amber-800"><span className="font-semibold">📝 Note:</span> {p.description}</p>
-                          </div>
-                        )}
+                      <div className="space-y-1 text-sm text-white/70 mb-4">
+                        {p.dosage && <p>💉 {p.dosage}</p>}
+                        {p.frequency && <p>⏰ {p.frequency}</p>}
+                        {p.description && <p className="text-xs text-white/50 mt-2">{p.description}</p>}
                       </div>
-
-                      <div className="flex items-center justify-between pt-3 border-t border-blue-100">
-                        <p className="text-xs text-gray-400">{p.createdAt ? formatDate(p.createdAt) : ''}</p>
-                        <button
+                      <div className="flex justify-end">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => downloadPrescription(p)}
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm font-medium shadow-md hover:shadow-lg transition-all"
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-semibold"
                         >
-                          <span>🖨️</span> Print / Save PDF
-                        </button>
+                          🖨️ Print / Save PDF
+                        </motion.button>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
-            </div>
+            </motion.section>
           </div>
 
-          <div>
-            <div className="card mb-6 bg-gradient-to-br from-purple-500 to-indigo-500 text-white">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">🥽</span> VR Sessions
+          {/* Sidebar Column */}
+          <div className="space-y-6">
+            {/* VR Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              whileHover={{ scale: 1.03 }}
+              className="relative overflow-hidden glass-card p-6 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 border border-indigo-400/30"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-[60px] rounded-full" />
+              <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                <span>🥽</span> VR Adventures
                 {vrVideoAssignments.length > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{vrVideoAssignments.length} New</span>
+                  <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                    {vrVideoAssignments.length} New
+                  </span>
                 )}
               </h2>
-              <p className="text-purple-100 mb-4">Relax and explore calming VR content!</p>
-              <button onClick={() => setShowVR(true)}
-                className="w-full py-3 bg-white text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-all">
-                Enter VR Mode
-              </button>
-            </div>
+              <p className="text-white/70 text-sm mb-4">Explore calming VR content!</p>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowVR(true)}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold shadow-glow"
+              >
+                Enter VR Mode 🚀
+              </motion.button>
+            </motion.div>
 
-            <div className="card">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">🏆</span> My Rewards
+            {/* Rewards Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="glass-card p-6"
+            >
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-yellow-400" /> My Badges
               </h2>
               {rewards.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Complete tasks to earn rewards!</p>
+                <p className="text-white/50 text-center py-4 text-sm">Complete quests to earn badges!</p>
               ) : (
-                <div className="space-y-3">
-                  {rewards.slice(0, 5).map((reward) => (
-                    <div key={reward.rewardId} className="flex items-center gap-3 p-3 bg-yellow-50 rounded-xl">
-                      <span className="text-2xl">
+                <div className="grid grid-cols-2 gap-3">
+                  {rewards.slice(0, 6).map((reward) => (
+                    <motion.div
+                      key={reward.rewardId}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-400/20"
+                    >
+                      <span className="text-3xl mb-1">
                         {reward.badgeIcon === 'fire' ? '🔥' :
                          reward.badgeIcon === 'star' ? '⭐' :
                          reward.badgeIcon === 'trophy' ? '🏆' : '🎖️'}
                       </span>
-                      <div>
-                        <h4 className="font-semibold">{reward.badgeName}</h4>
-                        <p className="text-xs text-gray-500">{reward.description}</p>
-                      </div>
-                    </div>
+                      <p className="text-xs font-bold text-center text-white/80">{reward.badgeName}</p>
+                    </motion.div>
                   ))}
                 </div>
               )}
-            </div>
+            </motion.div>
 
-            <div className="card mt-6">
-              <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-2xl">🥇</span> Leaderboard
+            {/* Leaderboard */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="glass-card p-6"
+            >
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-yellow-300" /> Top Heroes
               </h2>
               {leaderboard.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Leaderboard is empty</p>
+                <p className="text-white/50 text-center py-4 text-sm">Leaderboard is empty</p>
               ) : (
                 <div className="space-y-2">
                   {leaderboard.slice(0, 5).map((entry) => (
-                    <div key={entry.childId} className={`flex items-center justify-between p-3 rounded-xl ${profile?.childId === entry.childId ? 'bg-emerald-100' : 'bg-gray-50'}`}>
-                      <div>
-                        <p className="font-semibold">#{entry.rank} {entry.childName}</p>
-                        <p className="text-xs text-gray-500">Level {entry.level} • Streak {entry.currentStreak}</p>
+                    <motion.div
+                      key={entry.childId}
+                      whileHover={{ scale: 1.03 }}
+                      className={`flex items-center justify-between p-3 rounded-xl ${
+                        profile?.childId === entry.childId 
+                          ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 border border-green-400/30' 
+                          : 'bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-black text-white/60">#{entry.rank}</span>
+                        <div>
+                          <p className="font-semibold text-sm">{entry.childName}</p>
+                          <p className="text-[10px] text-white/50">Lv.{entry.level} • 🔥{entry.currentStreak}</p>
+                        </div>
                       </div>
-                      <p className="font-bold text-gray-700">{entry.totalScore} pts</p>
-                    </div>
+                      <p className="font-bold text-sm text-yellow-300">{entry.totalScore} XP</p>
+                    </motion.div>
                   ))}
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
 
       {showVR && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="absolute top-4 right-4 z-10">
-            <button onClick={() => { setShowVR(false); setSelectedVideo(null); }} className="text-white text-3xl hover:text-red-400">✕</button>
-          </div>
-          <div className="w-full max-w-4xl w-full px-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full max-w-4xl"
+          >
+            <button onClick={() => { setShowVR(false); setSelectedVideo(null); }} className="absolute -top-12 right-0 text-white text-3xl hover:text-red-400">✕</button>
+            
             {selectedVideo ? (
               <div className="space-y-4">
-                <div className="aspect-video bg-black rounded-xl overflow-hidden">
+                <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
                   <iframe
                     src={selectedVideo}
                     className="w-full h-full"
@@ -867,97 +1088,142 @@ const ChildDashboard = () => {
                 {(() => {
                   const match = vrVideoAssignments.find(v => v.youtubeUrl && selectedVideo.includes(v.youtubeUrl.split('v=')[1]));
                   return match && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleMarkVideoWatched(match.assignmentId)}
-                      className="w-full py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition-all"
+                      className="w-full py-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold shadow-lg"
                     >
-                      Mark as Watched
-                    </button>
+                      ✓ Mark as Watched
+                    </motion.button>
                   );
                 })()}
               </div>
             ) : (
-              <div className="space-y-6 max-h-[85vh] overflow-y-auto">
-                {vrVideoAssignments.length > 0 && (
-                  <div>
-                    <h3 className="text-white font-display font-semibold text-lg mb-3">My VR Videos</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {vrVideoAssignments.map((v) => {
-                        const embedUrl = v.youtubeUrl ? v.youtubeUrl.replace('watch?v=', 'embed/') : null;
-                        if (!embedUrl) return null;
-                        return (
-                          <button key={v.assignmentId}
-                            onClick={() => setSelectedVideo(embedUrl)}
-                            className="p-4 rounded-xl text-left transition-all bg-purple-600 hover:bg-purple-500 text-white">
-                            <div className="flex items-start gap-3">
-                              <span className="text-3xl">🎬</span>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold">{v.videoTitle}</p>
-                                {v.description && <p className="text-sm opacity-75 mt-1">{v.description}</p>}
-                                {v.durationMinutes && <p className="text-xs mt-1 opacity-60">{v.durationMinutes} min</p>}
-                              </div>
+              <div className="glass-card p-6 max-h-[80vh] overflow-y-auto">
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <span>🥽</span> VR Adventures
+                </h3>
+                
+                {vrVideoAssignments.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {vrVideoAssignments.map((v) => {
+                      const embedUrl = v.youtubeUrl ? v.youtubeUrl.replace('watch?v=', 'embed/') : null;
+                      if (!embedUrl) return null;
+                      return (
+                        <motion.button
+                          key={v.assignmentId}
+                          whileHover={{ scale: 1.03, y: -4 }}
+                          onClick={() => setSelectedVideo(embedUrl)}
+                          className="p-5 rounded-2xl text-left bg-gradient-to-br from-indigo-500/40 to-purple-500/40 border border-indigo-400/30 hover:border-indigo-400/60 transition-all"
+                        >
+                          <div className="flex items-start gap-4">
+                            <span className="text-4xl">🎬</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-lg">{v.videoTitle}</p>
+                              {v.description && <p className="text-sm text-white/60 mt-1">{v.description}</p>}
+                              {v.durationMinutes && <p className="text-xs text-white/40 mt-2">{v.durationMinutes} min</p>}
                             </div>
-                          </button>
-                        );
-                      })}
-                    </div>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
                   </div>
-                )}
-
-                {vrVideoAssignments.length === 0 && (
-                  <div className="text-center text-white/60 py-12">
-                    <p className="text-4xl mb-4">🥽</p>
-                    <p>No VR videos assigned yet.</p>
-                    <p className="text-sm mt-2">Your doctor will assign VR videos for you.</p>
+                ) : (
+                  <div className="text-center py-12 text-white/50">
+                    <p className="text-5xl mb-4">🥽</p>
+                    <p className="text-lg">No VR videos assigned yet</p>
+                    <p className="text-sm mt-2">Your doctor will assign VR videos for you!</p>
                   </div>
                 )}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
       )}
 
       {activeGameTask && gameState && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-xl w-full">
-            <div className="flex items-start justify-between mb-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="glass-card p-6 max-w-xl w-full border border-white/20"
+          >
+            <div className="flex items-start justify-between mb-6">
               <div>
-                <h3 className="font-display text-xl font-semibold">{activeGameTask.moduleName}</h3>
-                <p className="text-sm text-gray-500">Difficulty: {activeGameTask.difficultyLevel}</p>
+                <h3 className="text-2xl font-black bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                  {activeGameTask.moduleName}
+                </h3>
+                <div className="flex gap-2 mt-2">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                    activeGameTask.difficultyLevel === 'HARD' ? 'bg-red-500/20 text-red-300' :
+                    activeGameTask.difficultyLevel === 'MEDIUM' ? 'bg-orange-500/20 text-orange-300' :
+                    'bg-green-500/20 text-green-300'
+                  }`}>
+                    {activeGameTask.difficultyLevel}
+                  </span>
+                </div>
               </div>
-              <button onClick={closeGameModal} className="text-gray-500 hover:text-gray-700">✕</button>
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={closeGameModal} 
+                className="text-white/60 hover:text-white text-xl"
+              >
+                ✕
+              </motion.button>
             </div>
 
             {gameState.type === 'memory' && (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Find matching card pairs.</p>
-                <div className="grid grid-cols-4 gap-2">
+                <p className="text-white/70 text-center mb-4">Find matching card pairs!</p>
+                <div className="grid grid-cols-4 gap-3">
                   {gameState.cards.map((card, idx) => {
                     const open = gameState.flipped.includes(idx) || gameState.matched.includes(idx);
+                    const matched = gameState.matched.includes(idx);
                     return (
-                      <button
+                      <motion.button
                         key={`${card}-${idx}`}
+                        whileHover={{ scale: open ? 1 : 1.1 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => handleMemoryFlip(idx)}
-                        className="h-16 rounded-lg border bg-gray-50 text-2xl hover:bg-gray-100"
+                        className={`h-20 rounded-2xl text-3xl flex items-center justify-center transition-all ${
+                          matched ? 'bg-gradient-to-br from-green-400/40 to-emerald-500/40 border border-green-400/40' :
+                          open ? 'bg-gradient-to-br from-blue-400/40 to-purple-500/40 border border-blue-400/40' :
+                          'bg-white/10 hover:bg-white/20 border border-white/20'
+                        }`}
                       >
                         {open ? card : '❓'}
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
+                <p className="text-center text-white/40 text-sm mt-4">Moves: {gameState.moves}</p>
               </div>
             )}
 
             {gameState.type === 'color' && (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Choose the color category.</p>
+                <p className="text-white/70 text-center mb-4">Choose the color category!</p>
                 <div className="text-center py-6">
-                  <p className="text-3xl font-bold mb-4">{gameState.items[gameState.index].color}</p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <p className="text-4xl font-black mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    {gameState.items[gameState.index].color}
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
                     {['Warm', 'Cool', 'Neutral'].map((c) => (
-                      <button key={c} onClick={() => submitColorChoice(c)} className="px-3 py-2 rounded-lg bg-sky-100 text-sky-800 hover:bg-sky-200">
+                      <motion.button
+                        key={c}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => submitColorChoice(c)}
+                        className={`px-4 py-3 rounded-xl font-bold ${
+                          c === 'Warm' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' :
+                          c === 'Cool' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' :
+                          'bg-gradient-to-r from-gray-500 to-slate-500 text-white'
+                        }`}
+                      >
                         {c}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -966,30 +1232,49 @@ const ChildDashboard = () => {
 
             {gameState.type === 'number' && (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Complete the number pattern.</p>
-                <p className="text-2xl font-semibold mb-4">{gameState.questions[gameState.index].text}</p>
-                <div className="flex gap-2">
+                <p className="text-white/70 text-center mb-4">Complete the number pattern!</p>
+                <p className="text-3xl font-bold text-center mb-6 text-white">{gameState.questions[gameState.index].text}</p>
+                <div className="flex gap-3">
                   <input
                     type="number"
                     value={gameState.answer}
                     onChange={(e) => setGameState({ ...gameState, answer: e.target.value })}
-                    className="input-field"
-                    placeholder="Enter missing number"
+                    className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white text-center text-xl font-bold placeholder-white/40 focus:outline-none focus:ring-4 focus:ring-blue-400/30"
+                    placeholder="?"
                   />
-                  <button onClick={submitNumberAnswer} className="btn-primary">Submit</button>
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={submitNumberAnswer} 
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold"
+                  >
+                    Submit
+                  </motion.button>
                 </div>
               </div>
             )}
 
             {gameState.type === 'shape' && (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Select the correct shape name.</p>
-                <div className="text-center text-6xl mb-4">{gameState.questions[gameState.index].target.symbol}</div>
-                <div className="grid grid-cols-3 gap-2">
+                <p className="text-white/70 text-center mb-4">Select the correct shape name!</p>
+                <motion.div 
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="text-center text-8xl mb-6"
+                >
+                  {gameState.questions[gameState.index].target.symbol}
+                </motion.div>
+                <div className="grid grid-cols-3 gap-3">
                   {gameState.questions[gameState.index].options.map((opt) => (
-                    <button key={opt.name} onClick={() => submitOptionGame(opt.name)} className="px-3 py-2 rounded-lg bg-indigo-100 text-indigo-700 hover:bg-indigo-200">
+                    <motion.button
+                      key={opt.name}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => submitOptionGame(opt.name)}
+                      className="px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold"
+                    >
                       {opt.name}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -997,13 +1282,21 @@ const ChildDashboard = () => {
 
             {gameState.type === 'story' && (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Choose the best ending.</p>
-                <p className="font-medium mb-4">{gameState.questions[gameState.index].prompt}</p>
-                <div className="space-y-2">
+                <p className="text-white/70 text-center mb-4">Choose the best ending!</p>
+                <div className="glass-card p-4 mb-6 bg-white/5">
+                  <p className="text-lg font-medium text-center">{gameState.questions[gameState.index].prompt}</p>
+                </div>
+                <div className="space-y-3">
                   {gameState.questions[gameState.index].options.map((opt) => (
-                    <button key={opt} onClick={() => submitOptionGame(opt)} className="w-full text-left px-3 py-2 rounded-lg bg-amber-100 text-amber-900 hover:bg-amber-200">
+                    <motion.button
+                      key={opt}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => submitOptionGame(opt)}
+                      className="w-full text-left px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/30 to-orange-500/30 border border-amber-400/30 hover:border-amber-400/60 font-medium transition-all"
+                    >
                       {opt}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -1011,90 +1304,158 @@ const ChildDashboard = () => {
 
             {gameState.type === 'emotion' && (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Identify the emotion.</p>
-                <div className="text-center text-6xl mb-4">{gameState.questions[gameState.index].emoji}</div>
-                <div className="grid grid-cols-3 gap-2">
+                <p className="text-white/70 text-center mb-4">Identify the emotion!</p>
+                <motion.div 
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="text-center text-8xl mb-6"
+                >
+                  {gameState.questions[gameState.index].emoji}
+                </motion.div>
+                <div className="grid grid-cols-3 gap-3">
                   {gameState.questions[gameState.index].options.map((opt) => (
-                    <button key={opt} onClick={() => submitOptionGame(opt)} className="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200">
+                    <motion.button
+                      key={opt}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => submitOptionGame(opt)}
+                      className="px-4 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold"
+                    >
                       {opt}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
             )}
 
             {gameState.type === 'focus' && (
-              <div className="text-center py-4">
-                <p className="text-sm text-gray-600 mb-3">Stay focused and keep watching the timer.</p>
-                <p className="text-5xl font-bold text-blue-700 mb-4">{gameState.remainingSeconds}s</p>
+              <div className="text-center py-6">
+                <p className="text-white/70 mb-6">Stay focused and keep watching the timer!</p>
+                <motion.div 
+                  animate={{ scale: gameState.started ? [1, 1.05, 1] : 1 }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                  className="text-7xl font-black mb-6 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+                >
+                  {gameState.remainingSeconds}s
+                </motion.div>
                 {!gameState.started ? (
-                  <button onClick={() => setGameState({ ...gameState, started: true })} className="btn-primary">Start Focus Timer</button>
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setGameState({ ...gameState, started: true })} 
+                    className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-lg shadow-glow"
+                  >
+                    🎯 Start Focus Timer
+                  </motion.button>
                 ) : (
-                  <p className="text-sm text-gray-500">Timer running...</p>
+                  <p className="text-white/60 animate-pulse">Timer running... You got this!</p>
                 )}
               </div>
             )}
 
             {gameState.type === 'breathing' && (
-              <div className="text-center py-4">
-                <p className="text-sm text-gray-600 mb-3">Follow breathing: inhale and exhale slowly.</p>
-                <div className="w-40 h-40 mx-auto rounded-full bg-cyan-100 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-semibold text-cyan-700">{gameState.phase}</span>
-                </div>
-                <p className="text-3xl font-bold text-cyan-700 mb-4">{gameState.remainingSeconds}s</p>
+              <div className="text-center py-6">
+                <p className="text-white/70 mb-6">Follow the breathing circle - inhale and exhale slowly.</p>
+                <motion.div 
+                  animate={{ 
+                    scale: gameState.started ? (gameState.phase === 'Inhale' ? [1, 1.3] : [1.3, 1]) : 1 
+                  }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                  className="w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mb-6 shadow-glow"
+                >
+                  <span className="text-2xl font-bold text-white">{gameState.phase}</span>
+                </motion.div>
+                <p className="text-4xl font-bold text-cyan-300 mb-6">{gameState.remainingSeconds}s</p>
                 {!gameState.started ? (
-                  <button onClick={() => setGameState({ ...gameState, started: true })} className="btn-primary">Start Breathing</button>
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setGameState({ ...gameState, started: true })} 
+                    className="px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-lg shadow-glow"
+                  >
+                    🌬️ Start Breathing
+                  </motion.button>
                 ) : (
-                  <p className="text-sm text-gray-500">Keep breathing calmly...</p>
+                  <p className="text-white/60">Keep breathing calmly...</p>
                 )}
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
       )}
 
       {showFeedback && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-            <h3 className="font-display text-xl font-semibold mb-4">How was your experience?</h3>
-            <form onSubmit={submitFeedback} className="space-y-4">
-              <div className="flex justify-center gap-2">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass-card p-6 max-w-md w-full"
+          >
+            <h3 className="text-2xl font-black mb-4 text-center">How was your experience?</h3>
+            <form onSubmit={submitFeedback} className="space-y-6">
+              <div className="flex justify-center gap-3">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star} type="button" onClick={() => setFeedbackForm({...feedbackForm, rating: star})}
-                    className={`text-4xl ${star <= feedbackForm.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+                  <motion.button
+                    key={star}
+                    type="button"
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setFeedbackForm({...feedbackForm, rating: star})}
+                    className={`text-5xl transition-colors ${star <= feedbackForm.rating ? 'text-yellow-400' : 'text-white/20'}`}
+                  >
                     ★
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-              <textarea value={feedbackForm.comment} onChange={(e) => setFeedbackForm({...feedbackForm, comment: e.target.value})}
-                className="input-field" rows="3" placeholder="Tell us what you think..." />
-              <div className="flex gap-2">
-                <button type="submit" className="btn-primary flex-1">Submit</button>
-                <button type="button" onClick={() => setShowFeedback(false)} className="px-4 py-2 text-gray-600">Cancel</button>
+              <textarea 
+                value={feedbackForm.comment} 
+                onChange={(e) => setFeedbackForm({...feedbackForm, comment: e.target.value})}
+                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/40 focus:outline-none focus:ring-4 focus:ring-yellow-400/30 resize-none" 
+                rows="3" 
+                placeholder="Tell us what you think..." 
+              />
+              <div className="flex gap-3">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit" 
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold shadow-glow"
+                >
+                  Submit ⭐
+                </motion.button>
+                <button type="button" onClick={() => setShowFeedback(false)} className="px-6 py-3 rounded-xl bg-white/10 text-white/80">
+                  Cancel
+                </button>
               </div>
             </form>
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* Chatbot Floating Button */}
-      <button
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => setShowChatbot(!showChatbot)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl shadow-xl hover:shadow-2xl hover:scale-110 transition-all z-40"
+        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-3xl shadow-xl shadow-purple-500/30 z-40"
         title="Chat with CogniBot"
       >
         🤖
-      </button>
+      </motion.button>
 
       {/* Chatbot Panel */}
       {showChatbot && (
-        <div className="fixed bottom-24 right-6 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-40 flex flex-col max-h-[70vh]">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          className="fixed bottom-24 right-6 w-80 sm:w-96 glass-card border border-white/20 rounded-2xl shadow-2xl z-40 flex flex-col max-h-[70vh]"
+        >
           {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-t-2xl px-4 py-3 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-t-2xl px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-white">
               <span className="text-xl">🤖</span>
               <div>
-                <p className="font-semibold text-sm">CogniBot</p>
+                <p className="font-bold text-sm">CogniBot</p>
                 <p className="text-xs opacity-75">Your friendly assistant</p>
               </div>
             </div>
@@ -1102,10 +1463,14 @@ const ChildDashboard = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[400px]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[400px] bg-white/5">
             {chatMessages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${msg.from === 'user' ? 'bg-indigo-500 text-white rounded-br-md' : 'bg-gray-100 text-gray-800 rounded-bl-md'}`}>
+                <div className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${
+                  msg.from === 'user' 
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-br-md' 
+                    : 'bg-white/20 text-white rounded-bl-md'
+                }`}>
                   {msg.text}
                 </div>
               </div>
@@ -1113,25 +1478,27 @@ const ChildDashboard = () => {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-200 p-3">
+          <div className="border-t border-white/10 p-3">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                placeholder="Type a message..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Ask me anything..."
+                className="flex-1 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400"
               />
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleSendChat}
-                className="px-4 py-2 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 text-sm font-medium"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold text-sm"
               >
                 Send
-              </button>
+              </motion.button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
